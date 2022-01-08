@@ -36,7 +36,7 @@ function find_top() {
 function m() {
     local TOP
     TOP="$(find_top)" || return
-
+    echo $TOP
     if [ -z $TARGET ]; then
         echo "Error: need to set target"
         set_target
