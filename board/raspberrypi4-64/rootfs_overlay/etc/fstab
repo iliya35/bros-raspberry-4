@@ -1,0 +1,2 @@
+/dev/root / auto rw 0 1
+none /dev/pts devpts defaults 0 0
