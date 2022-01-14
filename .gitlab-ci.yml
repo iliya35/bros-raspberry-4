@@ -1,0 +1,74 @@
+# Configuration for Gitlab-CI.
+
+image: ssrs.local:5000/buildroot
+
+before_script:
+    - . env_setup.sh
+
+variables:
+  BR2_TARGET: raspberrypi4-64
+  BR2_PKG_DOWNLOAD: "true"
+  BR2_TARGET_REBUILD: "true"
+  BR2_OUTPT_IMG: "output/$BR2_TARGET/images"
+
+
+.global_job_template: &global_job_template
+        tags: [ docker, buildroot]
+        only: 
+            - schedules
+            - web
+            - api
+
+stages:
+  - build
+  - deploy
+
+
+buildroot-pipeline:
+  <<: *global_job_template
+  stage: build
+  needs: []
+  script:
+    - set_target $BR2_TARGET
+    - >
+       [ ! -z $BR2_PKG_DOWNLOAD ] && m source    
+    - m
+  allow_failure: false
+  cache:
+    - key: 
+      paths:
+      - output/$BR2_TARGET
+    - key: 
+      paths:
+      - downloads
+  artifacts:
+    when: always
+    paths:
+      - downloads
+      - $BR2_OUTPT_IMG
+    expire_in: 1 day
+
+
+deploy_job:
+    <<: *global_job_template
+    stage: deploy
+    needs: 
+      - buildroot-pipeline
+    script:
+        - mkdir ~/.ssh
+        - cp $DEPLOY_PRIVATE_KEY ~/.ssh/id_rsa
+        - chmod 600 ~/.ssh/id_rsa
+        - TIMESTAMP=$(date +%F_%H-%M)
+        - DEPLOY_FULL_PATH=$DEPLOY_DIRECTORY/$CI_PROJECT_TITLE/$CI_COMMIT_BRANCH/$TIMESTAMP
+        - git log -1 --pretty='format:%h %ad %cn%n   %s%n%n' --date short > $BR2_OUTPT_IMG/DESCRIPTION.txt
+        - git submodule foreach "git log -1 --pretty='format:%h %ad %cn%n   %s%n%n' --date short" >> $BR2_OUTPT_IMG/DESCRIPTION.txt
+        - >-
+            ssh
+            -o UserKnownHostsFile=$DEPLOY_SERVER_FP
+            -p $DEPLOY_SSH_PORT
+            $DEPLOY_USER_AT_SERVER
+            mkdir -p $DEPLOY_FULL_PATH
+        - >-
+           rsync -e "ssh -o UserKnownHostsFile=$DEPLOY_SERVER_FP -p $DEPLOY_SSH_PORT"
+           -Pav $BR2_OUTPT_IMG/ $DEPLOY_USER_AT_SERVER:$DEPLOY_FULL_PATH/
+

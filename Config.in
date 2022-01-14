@@ -1,1 +1,2 @@
 source "$BR2_EXTERNAL_YA_STREAMS_PATH/package/seeed-voicecard/Config.in"
+source "$BR2_EXTERNAL_YA_STREAMS_PATH/package/usbip/Config.in"
