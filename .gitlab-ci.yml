@@ -7,9 +7,9 @@ before_script:
 
 variables:
   BR2_TARGET: raspberrypi4-64
-  BR2_PKG_DOWNLOAD: "true"
-  BR2_TARGET_REBUILD: "true"
   BR2_OUTPT_IMG: "output/$BR2_TARGET/images"
+  BR2_PKG_REDOWNLOAD: "false"
+  BR2_TARGET_REBUILD: "false"
 
 
 .global_job_template: &global_job_template
@@ -24,36 +24,53 @@ stages:
   - deploy
 
 
-buildroot-pipeline:
+buildroot-source:
   <<: *global_job_template
-  stage: build
+  stage: .pre
   needs: []
   script:
     - set_target $BR2_TARGET
     - >
-       [ ! -z $BR2_PKG_DOWNLOAD ] && m source    
+      [ "$BR2_PKG_REDOWNLOAD" == "true"] && rm -rf downloads/*
+    - m source
+  allow_failure: false
+  cache:
+      when: 'always'
+      policy: pull-push
+      key: $CI_COMMIT_REF_SLUG
+      paths:
+        - downloads
+
+buildroot-build:
+  <<: *global_job_template
+  stage: build
+  needs: [ buildroot-source ]
+  script:
+    - >
+      [ "$BR2_TARGET_REBUILD" == "true"] && git clean -fxd -e downloads
+    - set_target $BR2_TARGET
     - m
   allow_failure: false
   cache:
-    - key: 
+    - when: 'always'
+      policy: pull
+      key: $CI_COMMIT_REF_SLUG
       paths:
-      - output/$BR2_TARGET
-    - key: 
+        - downloads
+    - key: $BR2_TARGET
       paths:
-      - downloads
+        - output/$BR2_TARGET
   artifacts:
     when: always
     paths:
-      - downloads
       - $BR2_OUTPT_IMG
     expire_in: 1 day
-
 
 deploy_job:
     <<: *global_job_template
     stage: deploy
     needs: 
-      - buildroot-pipeline
+      - buildroot-build
     script:
         - mkdir ~/.ssh
         - cp $DEPLOY_PRIVATE_KEY ~/.ssh/id_rsa
