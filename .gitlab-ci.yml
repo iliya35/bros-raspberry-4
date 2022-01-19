@@ -49,7 +49,7 @@ buildroot-build:
     - >
       [ "$BR2_TARGET_REBUILD" == "true"] && git clean -fxd -e downloads
     - set_target $BR2_TARGET
-    - m
+    - m -s
   allow_failure: false
   cache:
     - when: 'always'
