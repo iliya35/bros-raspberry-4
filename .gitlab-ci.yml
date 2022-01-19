@@ -31,8 +31,8 @@ buildroot-source:
   script:
     - set_target $BR2_TARGET
     - >
-      [ "$BR2_PKG_REDOWNLOAD" == "true"] && rm -rf downloads/*
-    - m source
+      [ "$BR2_PKG_REDOWNLOAD" == "true" ] && rm -rf downloads/*
+    - m -s source
   allow_failure: false
   cache:
       when: 'always'
@@ -47,7 +47,7 @@ buildroot-build:
   needs: [ buildroot-source ]
   script:
     - >
-      [ "$BR2_TARGET_REBUILD" == "true"] && git clean -fxd -e downloads
+      [ "$BR2_TARGET_REBUILD" == "true" ] && git clean -fxd -e downloads
     - set_target $BR2_TARGET
     - m -s
   allow_failure: false
