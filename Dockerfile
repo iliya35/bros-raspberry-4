@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu
 
 ARG UNAME=buildroot
 ARG BUILDROOT_VER=2021.02
@@ -8,7 +8,7 @@ ARG GID=1000
 # install applications
 RUN apt-get update
 RUN apt-get install -y \
-    sudo build-essential file wget cpio unzip rsync bc locales libncurses-dev vim python3 git
+    sudo build-essential file wget cpio unzip rsync bc locales libncurses-dev vim python3 git u-boot-tools
 
 # set the locale
 RUN locale-gen en_US.UTF-8

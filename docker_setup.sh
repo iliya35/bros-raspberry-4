@@ -17,7 +17,7 @@ docker_build() {
         --build-arg UNAME=$DOCKER_USER \
         --build-arg BUILDROOT_VER=$DOCKER_BUILDROOT_VER \
         .
-    read -p "Do you want push the $DOCKER_IMAGE image to local registy server ssrs.local:5000?" -n 1 -r
+    read -p "Do you want push the $DOCKER_IMAGE image to local registy server ssrs.local:5000? [Y/n] " -n 1 -r
     echo    # (optional) move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]
     then

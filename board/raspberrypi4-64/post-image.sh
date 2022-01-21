@@ -22,7 +22,7 @@ __EOF__
 		;;
 		--aarch64)
 		# Run a 64bits kernel (armv8)
-		sed -e '/^kernel=/s,=.*,=Image,' -i "${BINARIES_DIR}/rpi-firmware/config.txt"
+		sed -e '/^kernel=/s,=.*,=u-boot.bin,' -i "${BINARIES_DIR}/rpi-firmware/config.txt"
 		if ! grep -qE '^arm_64bit=1' "${BINARIES_DIR}/rpi-firmware/config.txt"; then
 			cat << __EOF__ >> "${BINARIES_DIR}/rpi-firmware/config.txt"
 
@@ -39,6 +39,8 @@ __EOF__
 	esac
 
 done
+
+mkimage -A arm -O linux -T script -C none -n boot.scr -d ${BOARD_DIR}/boot.scr ${BINARIES_DIR}/boot.scr.uimg
 
 # Pass an empty rootpath. genimage makes a full copy of the given rootpath to
 # ${GENIMAGE_TMP}/root so passing TARGET_DIR would be a waste of time and disk
