@@ -57,7 +57,8 @@ buildroot-build:
       key: $CI_COMMIT_REF_SLUG
       paths:
         - downloads
-    - key: $BR2_TARGET
+    - when: 'always'
+      key: $BR2_TARGET
       paths:
         - output/$BR2_TARGET
   artifacts:
