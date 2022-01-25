@@ -26,6 +26,7 @@ stages:
 
 buildroot-source:
   <<: *global_job_template
+  tags: [ buildroot, internet]
   stage: .pre
   needs: []
   script:
