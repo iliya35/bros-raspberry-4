@@ -2,6 +2,7 @@
 /dts-v1/;
 #include "bcm2711.dtsi"
 #include "bcm2711-rpi.dtsi"
+#include "bcm283x-rpi-usb-peripheral.dtsi"
 
 / {
 	compatible = "raspberrypi,4-model-b", "brcm,bcm2711";
@@ -213,13 +214,6 @@
 		/* No PHY interrupt */
 		reg = <0x1>;
 	};
-};
-
-&usb {
-	dr_mode = "peripheral";
-	g-rx-fifo-size = <256>;
-	g-np-tx-fifo-size = <32>;
-	g-tx-fifo-size = <256 256 512 512 512 768 768>;
 };
 
 &pcie0 {
