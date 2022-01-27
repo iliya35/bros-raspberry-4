@@ -6,6 +6,10 @@ before_script:
     - . env_setup.sh
 
 variables:
+  # Runner configuration variables:
+  TRANSFER_METER_FREQUENCY: "2s"
+  CACHE_REQUEST_TIMEOUT: 60
+  # Project/pipeline configuration variables:
   BR2_TARGET: raspberrypi4-64
   BR2_OUTPT_IMG: "output/$BR2_TARGET/images"
   BR2_PKG_REDOWNLOAD: "false"
